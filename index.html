@@ -2,94 +2,183 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🐄 Leite Click</title>
 <style>
   * { box-sizing: border-box; }
   body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(180deg, #eaf6ff 0%, #dff0ff 100%);
+    background: #eaf6ff;
     color: #2b2b2b;
     display: flex;
     min-height: 100vh;
   }
 
-  /* LADO ESQUERDO - CLICKER */
+  /* ===================== LADO ESQUERDO - CLICKER / CENÁRIO ===================== */
   .left-panel {
     flex: 1.1;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    background: #ffffff;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, #9fd8ff 0%, #bfe8ff 38%, #bfe8ff 46%, #7cc95a 46%, #5fb646 78%, #4fa23a 100%);
     border-right: 4px solid #cfe9ff;
+  }
+
+  .cloud {
+    position: absolute;
+    font-size: 2.2em;
+    opacity: 0.85;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.05));
+    pointer-events: none;
+  }
+  .cloud.c1 { top: 8%; left: 8%; animation: drift 40s linear infinite; }
+  .cloud.c2 { top: 16%; right: 10%; font-size: 1.6em; animation: drift 55s linear infinite reverse; }
+  .cloud.c3 { top: 4%; left: 45%; font-size: 1.3em; animation: drift 65s linear infinite; }
+  @keyframes drift {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(25px); }
+    100% { transform: translateX(0); }
+  }
+
+  .grass-deco {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 26%;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 2px, transparent 2px 18px);
+    pointer-events: none;
+  }
+
+  .flower {
+    position: absolute;
+    font-size: 1.1em;
+    bottom: 6%;
+    opacity: 0.9;
+    pointer-events: none;
   }
 
   .counter {
     text-align: center;
     margin-top: 10px;
+    z-index: 2;
+    background: rgba(255,255,255,0.55);
+    padding: 6px 18px;
+    border-radius: 14px;
+    backdrop-filter: blur(2px);
   }
 
   .counter h1 {
     font-size: 2.2em;
     margin: 0;
-    color: #3a7bd5;
+    color: #205a9c;
   }
 
   .counter p {
     margin: 4px 0 0;
-    color: #666;
+    color: #35506b;
     font-size: 1em;
   }
 
+  .cow-name-tag {
+    z-index: 2;
+    margin-top: 22px;
+    background: #fff;
+    border: 3px solid #f5c542;
+    color: #6b4a10;
+    font-weight: bold;
+    font-size: 1.15em;
+    padding: 4px 18px;
+    border-radius: 20px;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.08);
+    position: relative;
+  }
+  .cow-name-tag::after {
+    content: "";
+    position: absolute;
+    bottom: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 9px 8px 0 8px;
+    border-style: solid;
+    border-color: #f5c542 transparent transparent transparent;
+  }
+
   .cow-wrapper {
-    margin-top: 30px;
+    margin-top: 12px;
     position: relative;
     cursor: pointer;
     user-select: none;
+    z-index: 2;
   }
 
   .cow {
-    font-size: 180px;
-    transition: transform 0.08s ease;
-    filter: drop-shadow(0 8px 10px rgba(0,0,0,0.15));
+    font-size: 170px;
+    line-height: 1;
+    display: block;
+    transition: transform 0.08s ease, filter 0.2s ease;
+    filter: drop-shadow(0 10px 8px rgba(0,0,0,0.25));
   }
 
   .cow-wrapper:active .cow {
     transform: scale(0.9) rotate(-3deg);
   }
 
+  .cow-switch-anim {
+    animation: cowSwitch 0.5s ease;
+  }
+  @keyframes cowSwitch {
+    0% { transform: scale(0.3) rotate(-8deg); opacity: 0.2; }
+    60% { transform: scale(1.15) rotate(4deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0); }
+  }
+
   .float-text {
     position: absolute;
     font-weight: bold;
-    color: #3a7bd5;
+    color: #205a9c;
     pointer-events: none;
     animation: floatUp 0.9s ease-out forwards;
     font-size: 1.3em;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.8);
   }
 
   @keyframes floatUp {
-    0% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-70px); }
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-70px) scale(1.1); }
   }
 
   .stats {
-    margin-top: 30px;
-    background: #f2f9ff;
+    margin-top: 24px;
+    background: rgba(255,255,255,0.75);
     border-radius: 12px;
     padding: 14px 22px;
     text-align: center;
     box-shadow: inset 0 0 0 2px #d5eaff;
+    z-index: 2;
+    transition: transform 0.15s ease;
+  }
+  .stats.pulse { animation: statsPulse 0.4s ease; }
+  @keyframes statsPulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.04); }
+    100% { transform: scale(1); }
   }
 
-  .stats p { margin: 4px 0; color: #444; }
+  .stats p { margin: 4px 0; color: #333; }
 
-  /* LADO DIREITO - LOJA */
+  /* ===================== LADO DIREITO - PAINEL ===================== */
   .right-panel {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
     max-height: 100vh;
+    background: #ffffff;
   }
 
   .right-panel h2 {
@@ -97,6 +186,33 @@
     color: #3a7bd5;
     margin-top: 0;
   }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px 6px;
+    border: 2px solid #d5eaff;
+    background: #f2f9ff;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #3a7bd5;
+    font-size: 0.9em;
+    transition: all 0.15s ease;
+  }
+  .tab-btn.active {
+    background: #3a7bd5;
+    color: #fff;
+    border-color: #3a7bd5;
+  }
+  .tab-btn:hover:not(.active) { background: #e3f2ff; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 
   .upgrade {
     background: #fff;
@@ -127,25 +243,10 @@
     text-align: center;
   }
 
-  .upgrade .info {
-    flex: 1;
-  }
-
-  .upgrade .info .name {
-    font-weight: bold;
-    color: #2b2b2b;
-  }
-
-  .upgrade .info .desc {
-    font-size: 0.82em;
-    color: #777;
-  }
-
-  .upgrade .price {
-    font-weight: bold;
-    color: #3a7bd5;
-    white-space: nowrap;
-  }
+  .upgrade .info { flex: 1; }
+  .upgrade .info .name { font-weight: bold; color: #2b2b2b; }
+  .upgrade .info .desc { font-size: 0.82em; color: #777; }
+  .upgrade .price { font-weight: bold; color: #3a7bd5; white-space: nowrap; }
 
   .upgrade .owned {
     background: #3a7bd5;
@@ -172,120 +273,287 @@
     font-size: 0.85em;
   }
   .reset-btn:hover { background: #ffc4c4; }
+
+  /* ===================== ABA VACAS ===================== */
+  .cow-card {
+    background: #fff;
+    border: 2px solid #d5eaff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    transition: all 0.15s ease;
+  }
+  .cow-card.unlocked { cursor: pointer; }
+  .cow-card.unlocked:hover { background: #eef8ff; transform: translateX(3px); }
+  .cow-card.active { border-color: #f5c542; background: #fff9e8; }
+  .cow-card.locked { opacity: 0.55; }
+  .cow-card.just-unlocked { animation: unlockGlow 1.2s ease; }
+  @keyframes unlockGlow {
+    0% { box-shadow: 0 0 0 0 rgba(245,197,66,0.9); }
+    60% { box-shadow: 0 0 0 14px rgba(245,197,66,0); }
+    100% { box-shadow: 0 0 0 0 rgba(245,197,66,0); }
+  }
+
+  .cow-card .icon {
+    font-size: 2.6em;
+    width: 55px;
+    text-align: center;
+  }
+  .cow-card .info { flex: 1; }
+  .cow-card .info .name { font-weight: bold; }
+  .cow-card .info .desc { font-size: 0.8em; color: #777; margin: 2px 0; }
+  .cow-card .info .prod { font-size: 0.82em; color: #3a7bd5; font-weight: bold; }
+  .cow-card .badge {
+    font-size: 0.72em;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  .cow-card .badge.active-badge { background: #f5c542; color: #6b4a10; }
+  .cow-card .badge.locked-badge { background: #eee; color: #888; }
+  .cow-card .badge.unlocked-badge { background: #d6f5d6; color: #2a7a2a; }
+
+  /* ===================== ABA RANKING ===================== */
+  .rank-note {
+    font-size: 0.8em;
+    color: #888;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .nickname-form {
+    background: #f2f9ff;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .nickname-form input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 2px solid #cfe4fb;
+    font-size: 1em;
+    margin: 10px 0;
+    text-align: center;
+  }
+  .nickname-form button, .rank-refresh-btn {
+    background: #3a7bd5;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .nickname-form button:hover, .rank-refresh-btn:hover { background: #2f66b3; }
+
+  .player-badge {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f2f9ff;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+  }
+  .player-badge button {
+    background: none;
+    border: none;
+    color: #3a7bd5;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.85em;
+  }
+
+  .rank-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    background: #fafcff;
+    border: 1px solid #e6f1fb;
+  }
+  .rank-row.top1 { background: linear-gradient(90deg,#fff6da,#fffdf2); border-color: #f5c542; }
+  .rank-row.top2 { background: linear-gradient(90deg,#f2f2f2,#fbfbfb); border-color: #c0c0c0; }
+  .rank-row.top3 { background: linear-gradient(90deg,#fbe6d4,#fff8f0); border-color: #d99a5b; }
+  .rank-row.me { outline: 2px solid #3a7bd5; }
+  .rank-row .pos { width: 34px; font-weight: bold; text-align: center; }
+  .rank-row .nick { flex: 1; font-weight: bold; }
+  .rank-row .score { color: #3a7bd5; font-weight: bold; white-space: nowrap; }
+
+  .rank-self-outside {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 2px dashed #d5eaff;
+  }
+
+  .rank-loading, .rank-error {
+    text-align: center;
+    color: #888;
+    padding: 20px 0;
+    font-size: 0.9em;
+  }
+
+  /* ===================== TOASTS ===================== */
+  .toast-container {
+    position: fixed;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+  .toast {
+    background: #2b2b2b;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 0.9em;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    animation: toastIn 0.3s ease, toastOut 0.4s ease 2.6s forwards;
+  }
+  .toast.gold { background: #f5c542; color: #6b4a10; }
+  @keyframes toastIn {
+    0% { opacity: 0; transform: translateY(-15px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes toastOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-15px); }
+  }
+
+  /* ===================== RESPONSIVO ===================== */
+  @media (max-width: 800px) {
+    body { flex-direction: column; }
+    .left-panel { border-right: none; border-bottom: 4px solid #cfe9ff; padding: 14px; }
+    .cow { font-size: 110px; }
+    .counter h1 { font-size: 1.7em; }
+    .right-panel { max-height: none; }
+    .tab-btn { font-size: 0.78em; padding: 8px 4px; }
+  }
 </style>
 </head>
 <body>
 
+<div class="toast-container" id="toastContainer"></div>
+
 <div class="left-panel">
+  <div class="cloud c1">☁️</div>
+  <div class="cloud c2">☁️</div>
+  <div class="cloud c3">☁️</div>
+  <div class="flower" style="left:10%;">🌼</div>
+  <div class="flower" style="left:25%; bottom:4%;">🌷</div>
+  <div class="flower" style="right:15%;">🌼</div>
+  <div class="flower" style="right:30%; bottom:5%;">🌷</div>
+  <div class="grass-deco"></div>
+
   <div class="counter">
-    <h1 id="milkCount">0 ml</h1>
-    <p id="perSecond">0 ml por segundo</p>
+    <h1 id="milkCount">0 L</h1>
+    <p id="perSecond">0 L por segundo</p>
   </div>
+
+  <div class="cow-name-tag" id="cowNameTag">Mimosa</div>
 
   <div class="cow-wrapper" id="cowBtn">
-    <div class="cow">🐄</div>
+    <div class="cow" id="cowIcon">🐄</div>
   </div>
 
-  <div class="stats">
-    <p>🥛 Total ordenhado: <span id="totalMilk">0</span> ml</p>
+  <div class="stats" id="statsBox">
+    <p>🥛 Total ordenhado: <span id="totalMilk">0</span> L</p>
     <p>👆 Cliques: <span id="clickCount">0</span></p>
-    <p>💪 Por clique: <span id="perClick">1</span> ml</p>
+    <p>💪 Por clique: <span id="perClick">1</span> L</p>
   </div>
 
   <button class="reset-btn" id="resetBtn">Reiniciar jogo</button>
 </div>
 
 <div class="right-panel">
-  <h2>🛒 Loja da Fazenda</h2>
-  <div id="shop"></div>
+  <h2>🚜 Leite Click</h2>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="loja">🛒 Loja</button>
+    <button class="tab-btn" data-tab="vacas">🐄 Vacas</button>
+    <button class="tab-btn" data-tab="ranking">🏆 Ranking</button>
+  </div>
+
+  <div class="tab-content active" id="tab-loja">
+    <div id="shop"></div>
+  </div>
+
+  <div class="tab-content" id="tab-vacas">
+    <div id="cowList"></div>
+  </div>
+
+  <div class="tab-content" id="tab-ranking">
+    <p class="rank-note">Seu apelido e sua produção total de leite ficam visíveis para todos os jogadores no ranking global.</p>
+    <div id="rankingArea"></div>
+  </div>
 </div>
 
 <script>
-  // ESTADO DO JOGO (em memória, sem localStorage)
+  // ===================== ESTADO DO JOGO =====================
   let state = {
     milk: 0,
     totalMilk: 0,
     clicks: 0,
-    perClick: 1,
-    upgrades: {}
+    dedoBonus: 0,
+    upgrades: {},
+    activeCowId: 'comum',
+    unlockedCowIds: ['comum'],
+    playerId: null,
+    nickname: null,
+    lastSyncedMilk: -1,
+    lastKnownRank: null
   };
 
+  // ===================== DEFINIÇÕES DE VACAS =====================
+  // Fácil de expandir: basta adicionar um novo objeto ao array.
+  const cowDefs = [
+    { id: 'comum',    name: 'Mimosa',    icon: '🐄', filter: 'none',
+      perClick: 1,    unlockAt: 0,       desc: 'A parceira que começou tudo.' },
+    { id: 'marrom',   name: 'Caramelo',  icon: '🐄', filter: 'sepia(0.85) saturate(3) hue-rotate(-8deg) brightness(0.85)',
+      perClick: 5,    unlockAt: 100,     desc: 'Pelagem castanha e mais disposição.' },
+    { id: 'malhada',  name: 'Pintadinha',icon: '🐮', filter: 'contrast(1.2) saturate(1.4)',
+      perClick: 25,   unlockAt: 1000,    desc: 'Cheia de manchas e de energia.' },
+    { id: 'especial', name: 'Estelar',   icon: '🐄', filter: 'hue-rotate(190deg) saturate(2.3) brightness(1.05)',
+      perClick: 100,  unlockAt: 10000,   desc: 'Um brilho diferente no pasto.' },
+    { id: 'rara',     name: 'Violeta',   icon: '🐄', filter: 'hue-rotate(270deg) saturate(3) brightness(1.1)',
+      perClick: 500,  unlockAt: 100000,  desc: 'Rara de se ver em qualquer fazenda.' },
+    { id: 'lendaria', name: 'Dourada',   icon: '🐄', filter: 'hue-rotate(40deg) saturate(4.5) brightness(1.35)',
+      perClick: 2500, unlockAt: 1000000, desc: 'A lenda das fazendas leiteiras.' }
+  ];
+
   const upgradeDefs = [
-    {
-      id: 'dedo',
-      icon: '👆',
-      name: 'Dedo Treinado',
-      desc: '+1 ml por clique',
-      basePrice: 15,
-      type: 'click',
-      value: 1
-    },
-    {
-      id: 'balde',
-      icon: '🪣',
-      name: 'Balde de Ordenha',
-      desc: '+1 ml/seg',
-      basePrice: 20,
-      type: 'auto',
-      value: 1
-    },
-    {
-      id: 'fazendeiro',
-      icon: '👨‍🌾',
-      name: 'Fazendeiro',
-      desc: '+5 ml/seg',
-      basePrice: 120,
-      type: 'auto',
-      value: 5
-    },
-    {
-      id: 'vaca_extra',
-      icon: '🐮',
-      name: 'Vaca Extra',
-      desc: '+10 ml/seg',
-      basePrice: 500,
-      type: 'auto',
-      value: 10
-    },
-    {
-      id: 'ordenhadeira',
-      icon: '⚙️',
-      name: 'Ordenhadeira Automática',
-      desc: '+40 ml/seg',
-      basePrice: 2000,
-      type: 'auto',
-      value: 40
-    },
-    {
-      id: 'fazenda',
-      icon: '🏚️',
-      name: 'Fazenda Leiteira',
-      desc: '+150 ml/seg',
-      basePrice: 8000,
-      type: 'auto',
-      value: 150
-    },
-    {
-      id: 'fabrica',
-      icon: '🏭',
-      name: 'Fábrica de Laticínios',
-      desc: '+600 ml/seg',
-      basePrice: 35000,
-      type: 'auto',
-      value: 600
-    },
-    {
-      id: 'nave_leiteira',
-      icon: '🛸',
-      name: 'Nave Leiteira Alienígena',
-      desc: '+2500 ml/seg',
-      basePrice: 150000,
-      type: 'auto',
-      value: 2500
-    }
+    { id: 'dedo', icon: '👆', name: 'Dedo Treinado', desc: '+1 L por clique', basePrice: 15, type: 'click', value: 1 },
+    { id: 'balde', icon: '🪣', name: 'Balde de Ordenha', desc: '+1 L/seg', basePrice: 20, type: 'auto', value: 1 },
+    { id: 'fazendeiro', icon: '👨‍🌾', name: 'Fazendeiro', desc: '+5 L/seg', basePrice: 120, type: 'auto', value: 5 },
+    { id: 'vaca_extra', icon: '🐮', name: 'Vaca Extra', desc: '+10 L/seg', basePrice: 500, type: 'auto', value: 10 },
+    { id: 'ordenhadeira', icon: '⚙️', name: 'Ordenhadeira Automática', desc: '+40 L/seg', basePrice: 2000, type: 'auto', value: 40 },
+    { id: 'fazenda', icon: '🏚️', name: 'Fazenda Leiteira', desc: '+150 L/seg', basePrice: 8000, type: 'auto', value: 150 },
+    { id: 'fabrica', icon: '🏭', name: 'Fábrica de Laticínios', desc: '+600 L/seg', basePrice: 35000, type: 'auto', value: 600 },
+    { id: 'nave_leiteira', icon: '🛸', name: 'Nave Leiteira Alienígena', desc: '+2500 L/seg', basePrice: 150000, type: 'auto', value: 2500 }
   ];
 
   upgradeDefs.forEach(u => state.upgrades[u.id] = 0);
+
+  // ===================== HELPERS =====================
+  function activeCow() {
+    return cowDefs.find(c => c.id === state.activeCowId) || cowDefs[0];
+  }
+
+  function currentPerClick() {
+    return activeCow().perClick + state.dedoBonus;
+  }
 
   function perSecondTotal() {
     return upgradeDefs
@@ -300,19 +568,42 @@
 
   function formatNumber(n) {
     n = Math.floor(n);
-    if (n >= 1e9) return (n/1e9).toFixed(2) + 'B';
-    if (n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+    if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
     if (n >= 1e3) return n.toLocaleString('pt-BR');
     return n.toString();
   }
 
+  function showToast(message, gold) {
+    const container = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = 'toast' + (gold ? ' gold' : '');
+    el.textContent = message;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 3100);
+  }
+
+  // ===================== RENDER PRINCIPAL =====================
   function render() {
-    document.getElementById('milkCount').textContent = formatNumber(state.milk) + ' ml';
-    document.getElementById('perSecond').textContent = formatNumber(perSecondTotal()) + ' ml por segundo';
+    document.getElementById('milkCount').textContent = formatNumber(state.milk) + ' L';
+    document.getElementById('perSecond').textContent = formatNumber(perSecondTotal()) + ' L por segundo';
     document.getElementById('totalMilk').textContent = formatNumber(state.totalMilk);
     document.getElementById('clickCount').textContent = state.clicks;
-    document.getElementById('perClick').textContent = formatNumber(state.perClick);
+    document.getElementById('perClick').textContent = formatNumber(currentPerClick());
 
+    const cow = activeCow();
+    document.getElementById('cowNameTag').textContent = cow.name;
+    const cowIconEl = document.getElementById('cowIcon');
+    cowIconEl.textContent = cow.icon;
+    cowIconEl.style.filter = (cow.filter && cow.filter !== 'none')
+      ? cow.filter + ' drop-shadow(0 10px 8px rgba(0,0,0,0.25))'
+      : 'drop-shadow(0 10px 8px rgba(0,0,0,0.25))';
+
+    renderShop();
+    renderCowList();
+  }
+
+  function renderShop() {
     const shop = document.getElementById('shop');
     shop.innerHTML = '';
     upgradeDefs.forEach(u => {
@@ -327,62 +618,315 @@
           <div class="desc">${u.desc}</div>
         </div>
         <div class="owned">${state.upgrades[u.id]}</div>
-        <div class="price">${formatNumber(price)} ml</div>
+        <div class="price">${formatNumber(price)} L</div>
       `;
       div.onclick = () => buyUpgrade(u);
       shop.appendChild(div);
     });
   }
 
+  // ===================== VACAS: DESBLOQUEIO E SELEÇÃO =====================
+  function checkUnlocks() {
+    cowDefs.forEach(c => {
+      if (!state.unlockedCowIds.includes(c.id) && state.totalMilk >= c.unlockAt) {
+        state.unlockedCowIds.push(c.id);
+        showToast('🎉 Nova vaca desbloqueada: ' + c.name + '!', true);
+        renderCowList(c.id);
+      }
+    });
+  }
+
+  function selectCow(id) {
+    if (!state.unlockedCowIds.includes(id) || state.activeCowId === id) return;
+    state.activeCowId = id;
+    render();
+    const cowIconEl = document.getElementById('cowIcon');
+    cowIconEl.classList.remove('cow-switch-anim');
+    void cowIconEl.offsetWidth; // reinicia a animação
+    cowIconEl.classList.add('cow-switch-anim');
+    showToast('🐄 Agora usando: ' + activeCow().name);
+  }
+
+  function renderCowList(justUnlockedId) {
+    const list = document.getElementById('cowList');
+    list.innerHTML = '';
+    cowDefs.forEach(c => {
+      const unlocked = state.unlockedCowIds.includes(c.id);
+      const isActive = state.activeCowId === c.id;
+      const div = document.createElement('div');
+      div.className = 'cow-card' + (unlocked ? ' unlocked' : ' locked') + (isActive ? ' active' : '') + (justUnlockedId === c.id ? ' just-unlocked' : '');
+
+      let badgeHtml;
+      if (isActive) badgeHtml = '<span class="badge active-badge">Ativa</span>';
+      else if (unlocked) badgeHtml = '<span class="badge unlocked-badge">Desbloqueada</span>';
+      else badgeHtml = '<span class="badge locked-badge">🔒 ' + formatNumber(c.unlockAt) + ' L</span>';
+
+      div.innerHTML = `
+        <div class="icon" style="filter:${unlocked ? (c.filter === 'none' ? 'none' : c.filter) : 'grayscale(1) brightness(0.7)'}">${unlocked ? c.icon : '🔒'}</div>
+        <div class="info">
+          <div class="name">${c.name}</div>
+          <div class="desc">${unlocked ? c.desc : 'Acumule ' + formatNumber(c.unlockAt) + ' L de leite total para desbloquear.'}</div>
+          <div class="prod">+${formatNumber(c.perClick)} L por clique</div>
+        </div>
+        ${badgeHtml}
+      `;
+      if (unlocked && !isActive) {
+        div.onclick = () => selectCow(c.id);
+      }
+      list.appendChild(div);
+    });
+  }
+
+  // ===================== COMPRAS E CLIQUE =====================
   function buyUpgrade(u) {
     const price = priceOf(u);
     if (state.milk < price) return;
     state.milk -= price;
     state.upgrades[u.id]++;
     if (u.type === 'click') {
-      state.perClick += u.value;
+      state.dedoBonus += u.value;
     }
     render();
   }
 
+  function pulseStats() {
+    const box = document.getElementById('statsBox');
+    box.classList.remove('pulse');
+    void box.offsetWidth;
+    box.classList.add('pulse');
+  }
+
   function clickCow(e) {
-    state.milk += state.perClick;
-    state.totalMilk += state.perClick;
+    const gain = currentPerClick();
+    state.milk += gain;
+    state.totalMilk += gain;
     state.clicks++;
 
     const floatEl = document.createElement('div');
     floatEl.className = 'float-text';
-    floatEl.textContent = '+' + formatNumber(state.perClick) + ' ml';
+    floatEl.textContent = '+' + formatNumber(gain) + ' L';
     const rect = e.currentTarget.getBoundingClientRect();
     floatEl.style.left = (e.clientX - rect.left) + 'px';
     floatEl.style.top = (e.clientY - rect.top) + 'px';
     e.currentTarget.appendChild(floatEl);
     setTimeout(() => floatEl.remove(), 900);
 
+    pulseStats();
+    checkUnlocks();
     render();
   }
 
   document.getElementById('cowBtn').addEventListener('click', clickCow);
 
   document.getElementById('resetBtn').addEventListener('click', () => {
-    if (confirm('Tem certeza que quer reiniciar o Leite Click? Todo seu progresso será perdido.')) {
-      state = { milk: 0, totalMilk: 0, clicks: 0, perClick: 1, upgrades: {} };
+    if (confirm('Tem certeza que quer reiniciar o Leite Click? Todo seu progresso (incluindo vacas desbloqueadas) será perdido. Sua posição no ranking também será reiniciada.')) {
+      state.milk = 0;
+      state.totalMilk = 0;
+      state.clicks = 0;
+      state.dedoBonus = 0;
+      state.activeCowId = 'comum';
+      state.unlockedCowIds = ['comum'];
       upgradeDefs.forEach(u => state.upgrades[u.id] = 0);
       render();
+      syncScore(true);
     }
   });
 
-  // loop automático
+  // loop automático (produção passiva)
+  let tickCounter = 0;
   setInterval(() => {
     const gain = perSecondTotal();
     if (gain > 0) {
       state.milk += gain / 10;
       state.totalMilk += gain / 10;
+      checkUnlocks();
       render();
+      tickCounter++;
+      if (tickCounter % 10 === 0) pulseStats(); // pulso leve a cada ~1s de produção
     }
   }, 100);
 
-  render();
+  // ===================== ABAS =====================
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      if (btn.dataset.tab === 'ranking') {
+        startRankingPolling();
+      } else {
+        stopRankingPolling();
+      }
+    });
+  });
+
+  // ===================== RANKING GLOBAL (armazenamento persistente) =====================
+  let rankingPollHandle = null;
+
+  function startRankingPolling() {
+    renderRankingArea();
+    stopRankingPolling();
+    rankingPollHandle = setInterval(renderRankingArea, 15000);
+  }
+  function stopRankingPolling() {
+    if (rankingPollHandle) { clearInterval(rankingPollHandle); rankingPollHandle = null; }
+  }
+
+  async function ensurePlayerProfile() {
+    try {
+      const res = await window.storage.get('player-profile', false);
+      if (res && res.value) {
+        const profile = JSON.parse(res.value);
+        state.playerId = profile.playerId;
+        state.nickname = profile.nickname;
+      }
+    } catch (e) {
+      // ainda não existe perfil salvo — normal na primeira vez
+    }
+  }
+
+  async function savePlayerProfile(nickname) {
+    if (!state.playerId) {
+      state.playerId = 'p_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    }
+    state.nickname = nickname;
+    try {
+      await window.storage.set('player-profile', JSON.stringify({ playerId: state.playerId, nickname }), false);
+    } catch (e) {
+      console.error('Erro ao salvar apelido', e);
+    }
+    await syncScore(true);
+    renderRankingArea();
+  }
+
+  async function syncScore(force) {
+    if (!state.playerId || !state.nickname) return;
+    if (!force && state.totalMilk === state.lastSyncedMilk) return;
+    try {
+      await window.storage.set('leaderboard:' + state.playerId, JSON.stringify({
+        playerId: state.playerId,
+        nickname: state.nickname,
+        totalMilk: state.totalMilk,
+        updatedAt: Date.now()
+      }), true);
+      state.lastSyncedMilk = state.totalMilk;
+    } catch (e) {
+      console.error('Erro ao sincronizar ranking', e);
+    }
+  }
+
+  function nicknameFormHtml(defaultValue) {
+    return `
+      <div class="nickname-form">
+        <div>🏆 Escolha um apelido para entrar no ranking global!</div>
+        <input type="text" id="nicknameInput" maxlength="18" value="${defaultValue}" placeholder="Seu apelido">
+        <div><button id="nicknameSaveBtn">Entrar no ranking</button></div>
+      </div>
+    `;
+  }
+
+  async function renderRankingArea() {
+    const area = document.getElementById('rankingArea');
+
+    if (!state.nickname) {
+      const suggestion = 'Fazendeiro' + Math.floor(Math.random() * 900 + 100);
+      area.innerHTML = nicknameFormHtml(suggestion);
+      document.getElementById('nicknameSaveBtn').onclick = () => {
+        const val = document.getElementById('nicknameInput').value.trim();
+        if (val.length > 0) savePlayerProfile(val);
+      };
+      return;
+    }
+
+    area.innerHTML = `
+      <div class="player-badge">
+        <span>Jogando como: <strong>${state.nickname}</strong></span>
+        <button id="editNicknameBtn">editar apelido</button>
+      </div>
+      <div class="rank-loading" id="rankLoadingMsg">Carregando ranking...</div>
+      <button class="rank-refresh-btn" id="rankRefreshBtn" style="display:block;margin:12px auto 0;">🔄 Atualizar ranking</button>
+    `;
+    document.getElementById('editNicknameBtn').onclick = () => {
+      area.innerHTML = nicknameFormHtml(state.nickname);
+      document.getElementById('nicknameSaveBtn').onclick = () => {
+        const val = document.getElementById('nicknameInput').value.trim();
+        if (val.length > 0) savePlayerProfile(val);
+      };
+    };
+    document.getElementById('rankRefreshBtn').onclick = () => renderRankingArea();
+
+    await syncScore(false);
+
+    try {
+      const listRes = await window.storage.list('leaderboard:', true);
+      const keys = (listRes && listRes.keys) || [];
+      const entries = [];
+      for (const k of keys) {
+        try {
+          const r = await window.storage.get(k, true);
+          if (r && r.value) entries.push(JSON.parse(r.value));
+        } catch (e) { /* ignora chave individual com problema */ }
+      }
+      entries.sort((a, b) => b.totalMilk - a.totalMilk);
+
+      const loadingMsg = document.getElementById('rankLoadingMsg');
+      if (loadingMsg) loadingMsg.remove();
+
+      const myIndex = entries.findIndex(e => e.playerId === state.playerId);
+      const myRank = myIndex >= 0 ? myIndex + 1 : null;
+
+      if (myRank !== null && state.lastKnownRank !== null && myRank < state.lastKnownRank) {
+        showToast('🏆 Você subiu para a posição #' + myRank + ' no ranking!', true);
+      }
+      state.lastKnownRank = myRank;
+
+      const top = entries.slice(0, 10);
+      let html = '<div>' + top.map((entry, idx) => {
+        const pos = idx + 1;
+        const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : pos;
+        const topClass = pos <= 3 ? ' top' + pos : '';
+        const meClass = entry.playerId === state.playerId ? ' me' : '';
+        return `<div class="rank-row${topClass}${meClass}">
+          <div class="pos">${medal}</div>
+          <div class="nick">${entry.nickname}</div>
+          <div class="score">${formatNumber(entry.totalMilk)} L</div>
+        </div>`;
+      }).join('') + '</div>';
+
+      if (myRank === null) {
+        html += '<p class="rank-loading">Produza leite para aparecer no ranking!</p>';
+      } else if (myRank > 10) {
+        html += `<div class="rank-self-outside">
+          <div class="rank-row me">
+            <div class="pos">${myRank}</div>
+            <div class="nick">${state.nickname} (você)</div>
+            <div class="score">${formatNumber(state.totalMilk)} L</div>
+          </div>
+        </div>`;
+      }
+
+      const refreshBtn = document.getElementById('rankRefreshBtn');
+      // Insere a lista antes do botão de atualizar
+      const listWrapper = document.createElement('div');
+      listWrapper.innerHTML = html;
+      area.insertBefore(listWrapper, refreshBtn);
+    } catch (e) {
+      const loadingMsg = document.getElementById('rankLoadingMsg');
+      if (loadingMsg) loadingMsg.className = 'rank-error';
+      if (loadingMsg) loadingMsg.textContent = 'Não foi possível carregar o ranking agora. Tente novamente em instantes.';
+      console.error('Erro ao carregar ranking', e);
+    }
+  }
+
+  // sincroniza a pontuação periodicamente em segundo plano
+  setInterval(() => { syncScore(false); }, 8000);
+
+  // ===================== INICIALIZAÇÃO =====================
+  (async function init() {
+    render();
+    await ensurePlayerProfile();
+  })();
 </script>
 
 </body>
