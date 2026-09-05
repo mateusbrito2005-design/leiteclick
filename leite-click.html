@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>🐄 Leite Click</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(180deg, #eaf6ff 0%, #dff0ff 100%);
+    color: #2b2b2b;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* LADO ESQUERDO - CLICKER */
+  .left-panel {
+    flex: 1.1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: #ffffff;
+    border-right: 4px solid #cfe9ff;
+  }
+
+  .counter {
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .counter h1 {
+    font-size: 2.2em;
+    margin: 0;
+    color: #3a7bd5;
+  }
+
+  .counter p {
+    margin: 4px 0 0;
+    color: #666;
+    font-size: 1em;
+  }
+
+  .cow-wrapper {
+    margin-top: 30px;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .cow {
+    font-size: 180px;
+    transition: transform 0.08s ease;
+    filter: drop-shadow(0 8px 10px rgba(0,0,0,0.15));
+  }
+
+  .cow-wrapper:active .cow {
+    transform: scale(0.9) rotate(-3deg);
+  }
+
+  .float-text {
+    position: absolute;
+    font-weight: bold;
+    color: #3a7bd5;
+    pointer-events: none;
+    animation: floatUp 0.9s ease-out forwards;
+    font-size: 1.3em;
+  }
+
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-70px); }
+  }
+
+  .stats {
+    margin-top: 30px;
+    background: #f2f9ff;
+    border-radius: 12px;
+    padding: 14px 22px;
+    text-align: center;
+    box-shadow: inset 0 0 0 2px #d5eaff;
+  }
+
+  .stats p { margin: 4px 0; color: #444; }
+
+  /* LADO DIREITO - LOJA */
+  .right-panel {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 100vh;
+  }
+
+  .right-panel h2 {
+    text-align: center;
+    color: #3a7bd5;
+    margin-top: 0;
+  }
+
+  .upgrade {
+    background: #fff;
+    border: 2px solid #d5eaff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .upgrade:hover:not(.disabled) {
+    background: #eef8ff;
+    transform: translateX(3px);
+  }
+
+  .upgrade.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .upgrade .icon {
+    font-size: 2.2em;
+    width: 50px;
+    text-align: center;
+  }
+
+  .upgrade .info {
+    flex: 1;
+  }
+
+  .upgrade .info .name {
+    font-weight: bold;
+    color: #2b2b2b;
+  }
+
+  .upgrade .info .desc {
+    font-size: 0.82em;
+    color: #777;
+  }
+
+  .upgrade .price {
+    font-weight: bold;
+    color: #3a7bd5;
+    white-space: nowrap;
+  }
+
+  .upgrade .owned {
+    background: #3a7bd5;
+    color: white;
+    border-radius: 50%;
+    min-width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+
+  .reset-btn {
+    display: block;
+    margin: 20px auto 0;
+    background: #ffdada;
+    border: 2px solid #ff9c9c;
+    color: #a33;
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.85em;
+  }
+  .reset-btn:hover { background: #ffc4c4; }
+</style>
+</head>
+<body>
+
+<div class="left-panel">
+  <div class="counter">
+    <h1 id="milkCount">0 ml</h1>
+    <p id="perSecond">0 ml por segundo</p>
+  </div>
+
+  <div class="cow-wrapper" id="cowBtn">
+    <div class="cow">🐄</div>
+  </div>
+
+  <div class="stats">
+    <p>🥛 Total ordenhado: <span id="totalMilk">0</span> ml</p>
+    <p>👆 Cliques: <span id="clickCount">0</span></p>
+    <p>💪 Por clique: <span id="perClick">1</span> ml</p>
+  </div>
+
+  <button class="reset-btn" id="resetBtn">Reiniciar jogo</button>
+</div>
+
+<div class="right-panel">
+  <h2>🛒 Loja da Fazenda</h2>
+  <div id="shop"></div>
+</div>
+
+<script>
+  // ESTADO DO JOGO (em memória, sem localStorage)
+  let state = {
+    milk: 0,
+    totalMilk: 0,
+    clicks: 0,
+    perClick: 1,
+    upgrades: {}
+  };
+
+  const upgradeDefs = [
+    {
+      id: 'dedo',
+      icon: '👆',
+      name: 'Dedo Treinado',
+      desc: '+1 ml por clique',
+      basePrice: 15,
+      type: 'click',
+      value: 1
+    },
+    {
+      id: 'balde',
+      icon: '🪣',
+      name: 'Balde de Ordenha',
+      desc: '+1 ml/seg',
+      basePrice: 20,
+      type: 'auto',
+      value: 1
+    },
+    {
+      id: 'fazendeiro',
+      icon: '👨‍🌾',
+      name: 'Fazendeiro',
+      desc: '+5 ml/seg',
+      basePrice: 120,
+      type: 'auto',
+      value: 5
+    },
+    {
+      id: 'vaca_extra',
+      icon: '🐮',
+      name: 'Vaca Extra',
+      desc: '+10 ml/seg',
+      basePrice: 500,
+      type: 'auto',
+      value: 10
+    },
+    {
+      id: 'ordenhadeira',
+      icon: '⚙️',
+      name: 'Ordenhadeira Automática',
+      desc: '+40 ml/seg',
+      basePrice: 2000,
+      type: 'auto',
+      value: 40
+    },
+    {
+      id: 'fazenda',
+      icon: '🏚️',
+      name: 'Fazenda Leiteira',
+      desc: '+150 ml/seg',
+      basePrice: 8000,
+      type: 'auto',
+      value: 150
+    },
+    {
+      id: 'fabrica',
+      icon: '🏭',
+      name: 'Fábrica de Laticínios',
+      desc: '+600 ml/seg',
+      basePrice: 35000,
+      type: 'auto',
+      value: 600
+    },
+    {
+      id: 'nave_leiteira',
+      icon: '🛸',
+      name: 'Nave Leiteira Alienígena',
+      desc: '+2500 ml/seg',
+      basePrice: 150000,
+      type: 'auto',
+      value: 2500
+    }
+  ];
+
+  upgradeDefs.forEach(u => state.upgrades[u.id] = 0);
+
+  function perSecondTotal() {
+    return upgradeDefs
+      .filter(u => u.type === 'auto')
+      .reduce((sum, u) => sum + u.value * state.upgrades[u.id], 0);
+  }
+
+  function priceOf(u) {
+    const owned = state.upgrades[u.id];
+    return Math.floor(u.basePrice * Math.pow(1.15, owned));
+  }
+
+  function formatNumber(n) {
+    n = Math.floor(n);
+    if (n >= 1e9) return (n/1e9).toFixed(2) + 'B';
+    if (n >= 1e6) return (n/1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return n.toLocaleString('pt-BR');
+    return n.toString();
+  }
+
+  function render() {
+    document.getElementById('milkCount').textContent = formatNumber(state.milk) + ' ml';
+    document.getElementById('perSecond').textContent = formatNumber(perSecondTotal()) + ' ml por segundo';
+    document.getElementById('totalMilk').textContent = formatNumber(state.totalMilk);
+    document.getElementById('clickCount').textContent = state.clicks;
+    document.getElementById('perClick').textContent = formatNumber(state.perClick);
+
+    const shop = document.getElementById('shop');
+    shop.innerHTML = '';
+    upgradeDefs.forEach(u => {
+      const price = priceOf(u);
+      const canAfford = state.milk >= price;
+      const div = document.createElement('div');
+      div.className = 'upgrade' + (canAfford ? '' : ' disabled');
+      div.innerHTML = `
+        <div class="icon">${u.icon}</div>
+        <div class="info">
+          <div class="name">${u.name}</div>
+          <div class="desc">${u.desc}</div>
+        </div>
+        <div class="owned">${state.upgrades[u.id]}</div>
+        <div class="price">${formatNumber(price)} ml</div>
+      `;
+      div.onclick = () => buyUpgrade(u);
+      shop.appendChild(div);
+    });
+  }
+
+  function buyUpgrade(u) {
+    const price = priceOf(u);
+    if (state.milk < price) return;
+    state.milk -= price;
+    state.upgrades[u.id]++;
+    if (u.type === 'click') {
+      state.perClick += u.value;
+    }
+    render();
+  }
+
+  function clickCow(e) {
+    state.milk += state.perClick;
+    state.totalMilk += state.perClick;
+    state.clicks++;
+
+    const floatEl = document.createElement('div');
+    floatEl.className = 'float-text';
+    floatEl.textContent = '+' + formatNumber(state.perClick) + ' ml';
+    const rect = e.currentTarget.getBoundingClientRect();
+    floatEl.style.left = (e.clientX - rect.left) + 'px';
+    floatEl.style.top = (e.clientY - rect.top) + 'px';
+    e.currentTarget.appendChild(floatEl);
+    setTimeout(() => floatEl.remove(), 900);
+
+    render();
+  }
+
+  document.getElementById('cowBtn').addEventListener('click', clickCow);
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (confirm('Tem certeza que quer reiniciar o Leite Click? Todo seu progresso será perdido.')) {
+      state = { milk: 0, totalMilk: 0, clicks: 0, perClick: 1, upgrades: {} };
+      upgradeDefs.forEach(u => state.upgrades[u.id] = 0);
+      render();
+    }
+  });
+
+  // loop automático
+  setInterval(() => {
+    const gain = perSecondTotal();
+    if (gain > 0) {
+      state.milk += gain / 10;
+      state.totalMilk += gain / 10;
+      render();
+    }
+  }, 100);
+
+  render();
+</script>
+
+</body>
+</html>
